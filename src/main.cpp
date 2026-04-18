@@ -47,8 +47,6 @@ class $modify(MyEditorUI, EditorUI) {
     bool init(LevelEditorLayer* lel) {
         if (!EditorUI::init(lel)) return false;
 
-        auto* menu = CCMenu::create();
-
         auto* btn = CCMenuItemToggler::createWithStandardSprites(
             this,
             menu_selector(MyEditorUI::onRecordToggle),
@@ -59,9 +57,11 @@ class $modify(MyEditorUI, EditorUI) {
         btn->m_offButton->setColor({180, 180, 180});
 
         m_fields->m_recordBtn = btn;
+
+        auto* menu = CCMenu::create();
         menu->addChild(btn);
-        menu->setPosition(ccp(230, 570));
-        this->addChild(menu);
+        menu->setPosition(ccp(185, 555));
+        this->addChild(menu, 10);
 
         return true;
     }
