@@ -7,6 +7,7 @@
 using namespace geode::prelude;
 
 static bool g_recordMode = false;
+static bool g_freezeCount = false;
 
 void spawnToggleTrigger(bool p1On) {
     auto* editor = LevelEditorLayer::get();
@@ -40,35 +41,51 @@ void spawnToggleTrigger(bool p1On) {
     }
 }
 
+class $modify(MyLevelEditorLayer, LevelEditorLayer) {
+    void updateObjectCount() {
+        if (g_freezeCount) return;
+        LevelEditorLayer::updateObjectCount();
+    }
+};
+
 class $modify(MyEditorUI, EditorUI) {
     struct Fields {
         CCMenuItemToggler* m_recordBtn = nullptr;
+        CCMenuItemToggler* m_freezeBtn = nullptr;
     };
 
     bool init(LevelEditorLayer* lel) {
         if (!EditorUI::init(lel)) return false;
 
-        auto* btn = CCMenuItemToggler::createWithStandardSprites(
+        // Кнопка запису (зелена)
+        auto* recordBtn = CCMenuItemToggler::createWithStandardSprites(
             this,
             menu_selector(MyEditorUI::onRecordToggle),
             0.7f
         );
+        recordBtn->m_onButton->setColor({0, 255, 0});
+        recordBtn->m_offButton->setColor({180, 180, 180});
+        m_fields->m_recordBtn = recordBtn;
 
-        btn->m_onButton->setColor({0, 255, 0});
-        btn->m_offButton->setColor({180, 180, 180});
+        auto* menu1 = CCMenu::create();
+        menu1->setPosition(ccp(192, 301));
+        menu1->addChild(recordBtn);
+        this->addChild(menu1, 10);
 
-        m_fields->m_recordBtn = btn;
+        // Кнопка заморозки (помаранчева) — правіше
+        auto* freezeBtn = CCMenuItemToggler::createWithStandardSprites(
+            this,
+            menu_selector(MyEditorUI::onFreezeToggle),
+            0.7f
+        );
+        freezeBtn->m_onButton->setColor({255, 165, 0});
+        freezeBtn->m_offButton->setColor({180, 180, 180});
+        m_fields->m_freezeBtn = freezeBtn;
 
-        auto* musicBtn = this->getChildByID("music-button");
-        CCPoint pos = ccp(192, 301);
-        if (musicBtn) {
-            pos = musicBtn->getPosition() + ccp(60, 0);
-        }
-
-        auto* menu = CCMenu::create();
-        menu->setPosition(pos);
-        menu->addChild(btn);
-        this->addChild(menu, 10);
+        auto* menu2 = CCMenu::create();
+        menu2->setPosition(ccp(222, 301));
+        menu2->addChild(freezeBtn);
+        this->addChild(menu2, 10);
 
         return true;
     }
@@ -76,6 +93,11 @@ class $modify(MyEditorUI, EditorUI) {
     void onRecordToggle(CCObject* sender) {
         g_recordMode = !g_recordMode;
         log::info("[RecordMod] Record mode: {}", g_recordMode);
+    }
+
+    void onFreezeToggle(CCObject* sender) {
+        g_freezeCount = !g_freezeCount;
+        log::info("[RecordMod] Freeze count: {}", g_freezeCount);
     }
 };
 
