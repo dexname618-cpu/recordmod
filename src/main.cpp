@@ -56,7 +56,7 @@ class $modify(MyEditorUI, EditorUI) {
         m_fields->m_recordBtn = btn;
 
         auto* musicBtn = this->getChildByID("music-button");
-        CCPoint pos = ccp(100, 400);
+        CCPoint pos = ccp(100, 300);
         if (musicBtn) {
             pos = musicBtn->getPosition() + ccp(60, 0);
         }
