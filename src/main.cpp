@@ -42,9 +42,25 @@ void spawnToggleTrigger(bool p1On) {
 }
 
 class $modify(MyLevelEditorLayer, LevelEditorLayer) {
-    void updateEditorLabel() {
-        if (g_freezeCount) return;
-        LevelEditorLayer::updateEditorLabel();
+    bool init(bool p0) {
+        if (!LevelEditorLayer::init(p0)) return false;
+        schedule(schedule_selector(MyLevelEditorLayer::freezeLabel), 0.1f);
+        return true;
+    }
+
+    void freezeLabel(float dt) {
+        if (!g_freezeCount) return;
+
+        for (int i = 0; i < (int)this->getChildrenCount(); i++) {
+            auto* child = this->getChildren()->objectAtIndex(i);
+            if (auto* label = typeinfo_cast<CCLabelBMFont*>(child)) {
+                std::string text = label->getString();
+                if (text.find("Objects:") != std::string::npos) {
+                    label->setString("Objects: ???");
+                    break;
+                }
+            }
+        }
     }
 };
 
