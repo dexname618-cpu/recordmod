@@ -28,4 +28,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: RecordMod-android64
-          path: build/*.geode
+          path: '**/*.geode'
