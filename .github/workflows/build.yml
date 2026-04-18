@@ -24,18 +24,17 @@ jobs:
           target: Android64
           sdk: latest
 
-      - name: Find geode file
-        run: find . -name "*.geode" -o -name "*.so" | head -20
+      - name: Package .geode file
+        run: |
+          mkdir -p geode_out
+          cp mod.json geode_out/
+          cp build/libRecordMod.so geode_out/libRecordMod.android64.so
+          cd geode_out
+          zip -r ../dexname.recordmod.geode .
+          cd ..
 
       - name: Upload .geode artifact
         uses: actions/upload-artifact@v4
         with:
           name: RecordMod-android64
-          path: '**/*.geode'
-          if-no-files-found: warn
-
-      - name: Upload .so artifact (fallback)
-        uses: actions/upload-artifact@v4
-        with:
-          name: RecordMod-android64-so
-          path: '**/*.so'
+          path: dexname.recordmod.geode
