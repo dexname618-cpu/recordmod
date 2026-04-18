@@ -15,12 +15,17 @@ void spawnToggleTrigger(bool p1On) {
     auto* player = editor->m_player1;
     if (!player) return;
 
-    auto pos = player->getPosition();
+    auto* objLayer = editor->m_objectLayer;
+    if (!objLayer) return;
+
+    auto worldPos = objLayer->convertToNodeSpace(
+        player->convertToWorldSpace(ccp(0, 0))
+    );
 
     auto data = gd::string(
         std::string("1,2899,2,") +
-        std::to_string((int)pos.x) + ",3," +
-        std::to_string((int)pos.y) + ",36,1,165," +
+        std::to_string((int)worldPos.x) + ",3," +
+        std::to_string((int)worldPos.y) + ",36,1,165," +
         std::to_string(p1On ? 1 : -1) + ";"
     );
 
@@ -30,7 +35,7 @@ void spawnToggleTrigger(bool p1On) {
 
     if (objs) {
         for (auto* obj : CCArrayExt<GameObject*>(objs)) {
-            obj->setPosition(pos);
+            obj->setPosition(worldPos);
         }
     }
 }
@@ -55,7 +60,7 @@ class $modify(MyEditorUI, EditorUI) {
         m_fields->m_recordBtn = btn;
 
         auto* musicBtn = this->getChildByID("music-button");
-        CCPoint pos = ccp(190, 301);
+        CCPoint pos = ccp(192, 301);
         if (musicBtn) {
             pos = musicBtn->getPosition() + ccp(60, 0);
         }
