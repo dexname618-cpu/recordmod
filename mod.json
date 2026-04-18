@@ -4,7 +4,7 @@
         "android": "2.2081"
     },
     "id": "dexname.recordmod",
-    "name": "Record Jumps",
+    "name": "Options Bot",
     "version": "1.0.0",
     "developer": "Dexname",
     "description": "Auto-places Option Triggers on jump input in editor",
