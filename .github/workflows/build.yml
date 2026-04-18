@@ -1,0 +1,31 @@
+name: Build RecordMod
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android64
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Geode SDK
+        uses: geode-sdk/build-geode-mod/setup@main
+
+      - name: Build Mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          platform: android64
+
+      - name: Upload .geode artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RecordMod-android64
+          path: build/*.geode
