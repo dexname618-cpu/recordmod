@@ -58,9 +58,15 @@ class $modify(MyEditorUI, EditorUI) {
 
         m_fields->m_recordBtn = btn;
 
+        auto* musicBtn = this->getChildByID("music-button");
+        CCPoint pos = ccp(160, 145);
+        if (musicBtn) {
+            pos = musicBtn->getPosition() + ccp(60, 0);
+        }
+
         auto* menu = CCMenu::create();
+        menu->setPosition(pos);
         menu->addChild(btn);
-        menu->setPosition(ccp(185, 555));
         this->addChild(menu, 10);
 
         return true;
