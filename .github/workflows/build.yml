@@ -13,14 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Build Mod
+      - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          target: android64
-          cli: v3.4.0
+          target: Android64
 
       - name: Upload .geode artifact
         uses: actions/upload-artifact@v4
