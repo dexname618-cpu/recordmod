@@ -1,6 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
-#include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 #include <Geode/modify/EditorUI.hpp>
 #include <string>
 
@@ -33,10 +33,6 @@ void spawnToggleTrigger(bool p1On) {
             editor->addToSection(obj);
         }
     }
-
-    log::info("[RecordMod] Spawned trigger at {},{} P1={}",
-        (int)pos.x, (int)pos.y, p1On ? "ON" : "OFF"
-    );
 }
 
 class $modify(MyEditorUI, EditorUI) {
@@ -78,20 +74,15 @@ class $modify(MyEditorUI, EditorUI) {
     }
 };
 
-class $modify(PlayerObject) {
-    void pushButton(PlayerButton btn) {
-        PlayerObject::pushButton(btn);
-        if (!g_recordMode) return;
-        if (btn != PlayerButton::Jump) return;
-        if (!LevelEditorLayer::get()) return;
-        spawnToggleTrigger(false);
-    }
+class $modify(GJBaseGameLayer) {
+    void handleButton(bool push, int button, bool isPlayer1) {
+        GJBaseGameLayer::handleButton(push, button, isPlayer1);
 
-    void releaseButton(PlayerButton btn) {
-        PlayerObject::releaseButton(btn);
         if (!g_recordMode) return;
-        if (btn != PlayerButton::Jump) return;
         if (!LevelEditorLayer::get()) return;
-        spawnToggleTrigger(true);
+        if (button != 1) return;
+        if (!isPlayer1) return;
+
+        spawnToggleTrigger(!push);
     }
 };
