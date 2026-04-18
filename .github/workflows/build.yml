@@ -28,7 +28,8 @@ jobs:
         run: |
           mkdir -p geode_out
           cp mod.json geode_out/
-          cp build/libRecordMod.so geode_out/libRecordMod.android64.so
+          if [ -f logo.png ]; then cp logo.png geode_out/; fi
+          cp build/libRecordMod.so geode_out/dexname.recordmod.android64.so
           cd geode_out
           zip -r ../dexname.recordmod.geode .
           cd ..
