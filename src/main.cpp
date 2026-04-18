@@ -30,6 +30,7 @@ void spawnToggleTrigger(bool p1On) {
 
     if (objs) {
         for (auto* obj : CCArrayExt<GameObject*>(objs)) {
+            obj->setPosition(pos);
             editor->addToSection(obj);
         }
     }
@@ -55,7 +56,7 @@ class $modify(MyEditorUI, EditorUI) {
         m_fields->m_recordBtn = btn;
 
         auto* musicBtn = this->getChildByID("music-button");
-        CCPoint pos = ccp(160, 145);
+        CCPoint pos = ccp(150, 210);
         if (musicBtn) {
             pos = musicBtn->getPosition() + ccp(60, 0);
         }
