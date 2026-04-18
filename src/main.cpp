@@ -57,7 +57,6 @@ class $modify(MyEditorUI, EditorUI) {
     bool init(LevelEditorLayer* lel) {
         if (!EditorUI::init(lel)) return false;
 
-        // Кнопка запису (зелена)
         auto* recordBtn = CCMenuItemToggler::createWithStandardSprites(
             this,
             menu_selector(MyEditorUI::onRecordToggle),
@@ -72,7 +71,6 @@ class $modify(MyEditorUI, EditorUI) {
         menu1->addChild(recordBtn);
         this->addChild(menu1, 10);
 
-        // Кнопка заморозки (помаранчева) — правіше
         auto* freezeBtn = CCMenuItemToggler::createWithStandardSprites(
             this,
             menu_selector(MyEditorUI::onFreezeToggle),
