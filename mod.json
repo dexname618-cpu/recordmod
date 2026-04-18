@@ -1,0 +1,12 @@
+{
+    "geode": "4.0.0",
+    "gd": {
+        "android": "2.2081"
+    },
+    "id": "dexname.recordmod",
+    "name": "Record Jumps",
+    "version": "1.0.0",
+    "developer": "Dexname",
+    "description": "Auto-places Option Triggers on jump input in editor",
+    "platforms": ["android64"]
+}
