@@ -2,6 +2,7 @@
 #include <Geode/modify/LevelEditorLayer.hpp>
 #include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/EditorUI.hpp>
+#include <string>
 
 using namespace geode::prelude;
 
@@ -16,15 +17,15 @@ void spawnToggleTrigger(bool p1On) {
 
     auto pos = player->getPosition();
 
-    auto data = fmt::format(
-        "1,2899,2,{},3,{},36,1,165,{};",
-        (int)pos.x,
-        (int)pos.y,
-        p1On ? 1 : -1
+    auto data = gd::string(
+        std::string("1,2899,2,") +
+        std::to_string((int)pos.x) + ",3," +
+        std::to_string((int)pos.y) + ",36,1,165," +
+        std::to_string(p1On ? 1 : -1) + ";"
     );
 
     auto* objs = editor->createObjectsFromString(
-        gd::string(data), true, true
+        data, true, true
     );
 
     if (objs) {
@@ -87,4 +88,4 @@ class $modify(PlayerObject) {
         if (!LevelEditorLayer::get()) return;
         spawnToggleTrigger(true);
     }
-}
+};
