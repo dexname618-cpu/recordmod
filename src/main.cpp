@@ -42,9 +42,9 @@ void spawnToggleTrigger(bool p1On) {
 }
 
 class $modify(MyLevelEditorLayer, LevelEditorLayer) {
-    void updateObjectCount() {
+    void updateEditorLabel() {
         if (g_freezeCount) return;
-        LevelEditorLayer::updateObjectCount();
+        LevelEditorLayer::updateEditorLabel();
     }
 };
 
