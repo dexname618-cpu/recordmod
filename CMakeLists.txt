@@ -6,15 +6,15 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
 project(recordmod VERSION 1.0.0)
 
+if (NOT DEFINED ENV{GEODE_SDK})
+    message(FATAL_ERROR "GEODE_SDK environment variable not set.")
+endif()
+
+add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+
 add_library(${PROJECT_NAME} SHARED
     src/main.cpp
 )
 
-if (NOT DEFINED ENV{GEODE_SDK})
-    message(FATAL_ERROR "GEODE_SDK environment variable not set.")
-else()
-    add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
-endif()
-
 target_link_libraries(${PROJECT_NAME} geode-sdk)
-create_geode_file(${PROJECT_NAME})
+setup_geode_mod(${PROJECT_NAME})
