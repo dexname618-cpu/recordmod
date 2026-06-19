@@ -33,35 +33,29 @@ class $modify(MyEditorLayer, LevelEditorLayer) {
         return 0.f;
     }
 
-    void onPlaytestKeyDown(int key) {
-        LevelEditorLayer::onPlaytestKeyDown(key);
-        if (key != 1) return;
-        if (m_fields->isHolding) return;
+    void handleAction(bool push, bool p1) {
+        LevelEditorLayer::handleAction(push, p1);
+
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        m_fields->isHolding = true;
+        if (!p1) return;
 
         float px   = getPlayerX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
-        int count1 = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
 
-        this->createObjectsFromString(buildOptionString(px, 1), true, true);
-        this->createObjectsFromString(buildPickupString(px, itemID, count1), true, true);
-    }
+        if (push) {
+            if (m_fields->isHolding) return;
+            m_fields->isHolding = true;
 
-    void onPlaytestKeyUp(int key) {
-        LevelEditorLayer::onPlaytestKeyUp(key);
-        if (key != 1) return;
-        if (!Mod::get()->getSettingValue<bool>("enabled")) {
+            int count = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
+            this->createObjectsFromString(buildOptionString(px, 1), true, true);
+            this->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        } else {
+            if (!m_fields->isHolding) return;
             m_fields->isHolding = false;
-            return;
+
+            int count = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
+            this->createObjectsFromString(buildOptionString(px, -1), true, true);
+            this->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
         }
-        m_fields->isHolding = false;
-
-        float px   = getPlayerX();
-        int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
-        int count2 = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
-
-        this->createObjectsFromString(buildOptionString(px, -1), true, true);
-        this->createObjectsFromString(buildPickupString(px, itemID, count2), true, true);
     }
-}
+};
