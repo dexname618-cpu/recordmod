@@ -1,0 +1,27 @@
+name: Build Geode Mod
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    name: Build (Android64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          target: Android64
+          sdk: latest
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dexname.recordmod
+          path: ./*.geode
