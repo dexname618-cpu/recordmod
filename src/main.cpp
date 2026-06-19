@@ -1,5 +1,5 @@
 #include <Geode/Geode.hpp>
-#include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
 
 using namespace geode::prelude;
 
@@ -22,24 +22,24 @@ static std::string buildPickupString(float x, int itemID, int count) {
            "449,1;";
 }
 
-class $modify(MyPlayLayer, PlayLayer) {
+class $modify(MyGameLayer, GJBaseGameLayer) {
 
     struct Fields {
         bool isHolding = false;
     };
 
     void pushButton(int button, bool player1) {
-        PlayLayer::pushButton(button, player1);
+        GJBaseGameLayer::pushButton(button, player1);
 
-        if (!this->m_isTestMode) return;
-        if (!player1) return;
-        if (button != 1) return;
+        if (!player1 || button != 1) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (m_fields->isHolding) return;
-        m_fields->isHolding = true;
 
+        // Перевіряємо що ми в playtest редактора
         auto* editor = LevelEditorLayer::get();
         if (!editor) return;
+
+        if (m_fields->isHolding) return;
+        m_fields->isHolding = true;
 
         float px   = m_player1->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
@@ -50,17 +50,16 @@ class $modify(MyPlayLayer, PlayLayer) {
     }
 
     void releaseButton(int button, bool player1) {
-        PlayLayer::releaseButton(button, player1);
+        GJBaseGameLayer::releaseButton(button, player1);
 
-        if (!this->m_isTestMode) return;
-        if (!player1) return;
-        if (button != 1) return;
+        if (!player1 || button != 1) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!m_fields->isHolding) return;
-        m_fields->isHolding = false;
 
         auto* editor = LevelEditorLayer::get();
         if (!editor) return;
+
+        if (!m_fields->isHolding) return;
+        m_fields->isHolding = false;
 
         float px   = m_player1->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
