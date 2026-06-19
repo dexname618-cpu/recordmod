@@ -1,7 +1,24 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayerObject.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
 
 using namespace geode::prelude;
+
+// Глобальне посилання на редактор
+static LevelEditorLayer* g_editor = nullptr;
+
+class $modify(MyLevelEditorLayer, LevelEditorLayer) {
+    bool init(GJGameLevel* level, bool unk) {
+        if (!LevelEditorLayer::init(level, unk)) return false;
+        g_editor = this;
+        return true;
+    }
+
+    void onStopPlaytest() {
+        LevelEditorLayer::onStopPlaytest();
+        g_editor = this;
+    }
+};
 
 static std::string buildOptionString(float x, int mode) {
     return "1,2899,"
@@ -33,10 +50,7 @@ class $modify(MyPlayerObject, PlayerObject) {
 
         if (button != PlayerButton::Jump) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-
-        auto* editor = LevelEditorLayer::get();
-        if (!editor) return;
-
+        if (!g_editor) return;
         if (m_fields->isHolding) return;
         m_fields->isHolding = true;
 
@@ -44,8 +58,8 @@ class $modify(MyPlayerObject, PlayerObject) {
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
 
-        editor->createObjectsFromString(buildOptionString(px, 1), true, true);
-        editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
+        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
     }
 
     void releaseButton(PlayerButton button) {
@@ -53,10 +67,7 @@ class $modify(MyPlayerObject, PlayerObject) {
 
         if (button != PlayerButton::Jump) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-
-        auto* editor = LevelEditorLayer::get();
-        if (!editor) return;
-
+        if (!g_editor) return;
         if (!m_fields->isHolding) return;
         m_fields->isHolding = false;
 
@@ -64,7 +75,7 @@ class $modify(MyPlayerObject, PlayerObject) {
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
 
-        editor->createObjectsFromString(buildOptionString(px, -1), true, true);
-        editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
+        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
     }
 };
