@@ -1,5 +1,5 @@
 #include <Geode/Geode.hpp>
-#include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/PlayerObject.hpp>
 #include <Geode/modify/LevelEditorLayer.hpp>
 
 using namespace geode::prelude;
@@ -33,43 +33,50 @@ static std::string buildPickupString(float x, int itemID, int count) {
            "449,1;";
 }
 
-class $modify(MyGameLayer, GJBaseGameLayer) {
+class $modify(MyPlayerObject, PlayerObject) {
 
     struct Fields {
         bool isHolding = false;
     };
 
-    void pushButton(PlayerButton button) {
-        GJBaseGameLayer::pushButton(button);
+    bool pushButton(PlayerButton button) {
+        bool result = PlayerObject::pushButton(button);
 
-        if (button != PlayerButton::Jump) return;
-        if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!g_editor) return;
-        if (m_fields->isHolding) return;
+        if (button != PlayerButton::Jump) return result;
+        if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
+        if (!g_editor) return result;
+        // Тільки для player1 редактора
+        if (g_editor->m_player1 != this) return result;
+        if (m_fields->isHolding) return result;
         m_fields->isHolding = true;
 
-        float px   = m_player1->getPositionX();
+        float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
 
         g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
         g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+
+        return result;
     }
 
-    void releaseButton(PlayerButton button) {
-        GJBaseGameLayer::releaseButton(button);
+    bool releaseButton(PlayerButton button) {
+        bool result = PlayerObject::releaseButton(button);
 
-        if (button != PlayerButton::Jump) return;
-        if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!g_editor) return;
-        if (!m_fields->isHolding) return;
+        if (button != PlayerButton::Jump) return result;
+        if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
+        if (!g_editor) return result;
+        if (g_editor->m_player1 != this) return result;
+        if (!m_fields->isHolding) return result;
         m_fields->isHolding = false;
 
-        float px   = m_player1->getPositionX();
+        float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
 
         g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
         g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+
+        return result;
     }
 };
