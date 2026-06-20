@@ -4,7 +4,6 @@
 
 using namespace geode::prelude;
 
-// Глобальне посилання на редактор
 static LevelEditorLayer* g_editor = nullptr;
 
 class $modify(MyLevelEditorLayer, LevelEditorLayer) {
@@ -51,6 +50,8 @@ class $modify(MyPlayerObject, PlayerObject) {
         if (button != PlayerButton::Jump) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
         if (!g_editor) return;
+        // Перевіряємо що це саме player1 редактора
+        if (g_editor->m_player1 != this) return;
         if (m_fields->isHolding) return;
         m_fields->isHolding = true;
 
@@ -68,6 +69,7 @@ class $modify(MyPlayerObject, PlayerObject) {
         if (button != PlayerButton::Jump) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
         if (!g_editor) return;
+        if (g_editor->m_player1 != this) return;
         if (!m_fields->isHolding) return;
         m_fields->isHolding = false;
 
