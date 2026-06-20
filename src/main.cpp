@@ -12,6 +12,11 @@ class $modify(MyLevelEditorLayer, LevelEditorLayer) {
         g_editor = this;
         return true;
     }
+
+    void onExit() {
+        LevelEditorLayer::onExit();
+        g_editor = nullptr;
+    }
 };
 
 static std::string buildOptionString(float x, int mode) {
@@ -45,17 +50,16 @@ class $modify(MyPlayerObject, PlayerObject) {
         if (button != PlayerButton::Jump) return result;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
         if (!g_editor) return result;
-        // Тільки для player1 редактора
         if (g_editor->m_player1 != this) return result;
         if (m_fields->isHolding) return result;
         m_fields->isHolding = true;
 
         float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
-        int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
 
-        g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
-        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        // Press: Enable P1 Controls (-1), Count = 1
+        g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
+        g_editor->createObjectsFromString(buildPickupString(px, itemID, 1), true, true);
 
         return result;
     }
@@ -72,10 +76,10 @@ class $modify(MyPlayerObject, PlayerObject) {
 
         float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
-        int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
 
-        g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
-        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        // Release: Disable P1 Controls (1), Count = 0
+        g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
+        g_editor->createObjectsFromString(buildPickupString(px, itemID, 0), true, true);
 
         return result;
     }
