@@ -5,7 +5,7 @@
     },
     "id": "dexname.recordmod",
     "name": "Options Bot",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "developer": "Dexname",
     "description": "Auto-places Option & Pickup Triggers on jump input in editor",
     "platforms": ["android64"],
@@ -21,22 +21,6 @@
             "type": "int",
             "default": 9,
             "min": 1,
-            "max": 9999
-        },
-        "pickup-count-press": {
-            "name": "Pickup Count (Press)",
-            "description": "Count для Pickup тригера при натисканні",
-            "type": "int",
-            "default": 5,
-            "min": -9999,
-            "max": 9999
-        },
-        "pickup-count-release": {
-            "name": "Pickup Count (Release)",
-            "description": "Count для Pickup тригера при відпусканні",
-            "type": "int",
-            "default": -5,
-            "min": -9999,
             "max": 9999
         }
     }
