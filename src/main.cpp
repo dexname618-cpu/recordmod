@@ -1,23 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/PlayerObject.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
 
 using namespace geode::prelude;
-
-static LevelEditorLayer* g_editor = nullptr;
-
-class $modify(MyLevelEditorLayer, LevelEditorLayer) {
-    bool init(GJGameLevel* level, bool unk) {
-        if (!LevelEditorLayer::init(level, unk)) return false;
-        g_editor = this;
-        return true;
-    }
-
-    void onExit() {
-        g_editor = nullptr;
-        LevelEditorLayer::onExit();
-    }
-};
 
 static std::string buildOptionString(float x, int mode) {
     return "1,2899,"
@@ -50,10 +34,10 @@ class $modify(MyPlayerObject, PlayerObject) {
         if (button != PlayerButton::Jump) return result;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
 
-        // Перевіряємо що g_editor живий і це його player1
-        if (!g_editor) return result;
-        if (!g_editor->m_player1) return result;
-        if (g_editor->m_player1 != this) return result;
+        // Перевіряємо що m_gameLayer це саме LevelEditorLayer
+        auto* editor = typeinfo_cast<LevelEditorLayer*>(m_gameLayer);
+        if (!editor) return result;
+        if (editor->m_player1 != this) return result;
 
         if (m_fields->isHolding) return result;
         m_fields->isHolding = true;
@@ -61,8 +45,8 @@ class $modify(MyPlayerObject, PlayerObject) {
         float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
 
-        g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
-        g_editor->createObjectsFromString(buildPickupString(px, itemID, 1), true, true);
+        editor->createObjectsFromString(buildOptionString(px, -1), true, true);
+        editor->createObjectsFromString(buildPickupString(px, itemID, 1), true, true);
 
         return result;
     }
@@ -73,9 +57,9 @@ class $modify(MyPlayerObject, PlayerObject) {
         if (button != PlayerButton::Jump) return result;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
 
-        if (!g_editor) return result;
-        if (!g_editor->m_player1) return result;
-        if (g_editor->m_player1 != this) return result;
+        auto* editor = typeinfo_cast<LevelEditorLayer*>(m_gameLayer);
+        if (!editor) return result;
+        if (editor->m_player1 != this) return result;
 
         if (!m_fields->isHolding) return result;
         m_fields->isHolding = false;
@@ -83,8 +67,8 @@ class $modify(MyPlayerObject, PlayerObject) {
         float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
 
-        g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
-        g_editor->createObjectsFromString(buildPickupString(px, itemID, 0), true, true);
+        editor->createObjectsFromString(buildOptionString(px, 1), true, true);
+        editor->createObjectsFromString(buildPickupString(px, itemID, 0), true, true);
 
         return result;
     }
