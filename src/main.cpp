@@ -1,7 +1,18 @@
 #include <Geode/Geode.hpp>
-#include <Geode/modify/PlayLayer.hpp>
+#include <Geode/modify/GJBaseGameLayer.hpp>
+#include <Geode/modify/LevelEditorLayer.hpp>
 
 using namespace geode::prelude;
+
+static LevelEditorLayer* g_editor = nullptr;
+
+class $modify(MyLevelEditorLayer, LevelEditorLayer) {
+    bool init(GJGameLevel* level, bool unk) {
+        if (!LevelEditorLayer::init(level, unk)) return false;
+        g_editor = this;
+        return true;
+    }
+};
 
 static std::string buildOptionString(float x, int mode) {
     return "1,2899,"
@@ -22,19 +33,18 @@ static std::string buildPickupString(float x, int itemID, int count) {
            "449,1;";
 }
 
-class $modify(MyPlayLayer, PlayLayer) {
+class $modify(MyGameLayer, GJBaseGameLayer) {
 
     struct Fields {
         bool isHolding = false;
     };
 
-    void pushButton(int button, bool player1) {
-        PlayLayer::pushButton(button, player1);
+    void pushButton(PlayerButton button) {
+        GJBaseGameLayer::pushButton(button);
 
-        if (!player1 || button != 1) return;
+        if (button != PlayerButton::Jump) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!m_isTestMode) return;
-        if (!m_editorLayer) return;
+        if (!g_editor) return;
         if (m_fields->isHolding) return;
         m_fields->isHolding = true;
 
@@ -42,17 +52,16 @@ class $modify(MyPlayLayer, PlayLayer) {
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
 
-        m_editorLayer->createObjectsFromString(buildOptionString(px, 1), true, true);
-        m_editorLayer->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
+        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
     }
 
-    void releaseButton(int button, bool player1) {
-        PlayLayer::releaseButton(button, player1);
+    void releaseButton(PlayerButton button) {
+        GJBaseGameLayer::releaseButton(button);
 
-        if (!player1 || button != 1) return;
+        if (button != PlayerButton::Jump) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!m_isTestMode) return;
-        if (!m_editorLayer) return;
+        if (!g_editor) return;
         if (!m_fields->isHolding) return;
         m_fields->isHolding = false;
 
@@ -60,7 +69,7 @@ class $modify(MyPlayLayer, PlayLayer) {
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
 
-        m_editorLayer->createObjectsFromString(buildOptionString(px, -1), true, true);
-        m_editorLayer->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
+        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
     }
 };
