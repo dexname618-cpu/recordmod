@@ -1,23 +1,7 @@
 #include <Geode/Geode.hpp>
-#include <Geode/modify/PlayerObject.hpp>
-#include <Geode/modify/LevelEditorLayer.hpp>
+#include <Geode/modify/PlayLayer.hpp>
 
 using namespace geode::prelude;
-
-static LevelEditorLayer* g_editor = nullptr;
-
-class $modify(MyLevelEditorLayer, LevelEditorLayer) {
-    bool init(GJGameLevel* level, bool unk) {
-        if (!LevelEditorLayer::init(level, unk)) return false;
-        g_editor = this;
-        return true;
-    }
-
-    void onStopPlaytest() {
-        LevelEditorLayer::onStopPlaytest();
-        g_editor = this;
-    }
-};
 
 static std::string buildOptionString(float x, int mode) {
     return "1,2899,"
@@ -38,46 +22,45 @@ static std::string buildPickupString(float x, int itemID, int count) {
            "449,1;";
 }
 
-class $modify(MyPlayerObject, PlayerObject) {
+class $modify(MyPlayLayer, PlayLayer) {
 
     struct Fields {
         bool isHolding = false;
     };
 
-    void pushButton(PlayerButton button) {
-        PlayerObject::pushButton(button);
+    void pushButton(int button, bool player1) {
+        PlayLayer::pushButton(button, player1);
 
-        if (button != PlayerButton::Jump) return;
+        if (!player1 || button != 1) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!g_editor) return;
-        // Перевіряємо що це саме player1 редактора
-        if (g_editor->m_player1 != this) return;
+        if (!m_isTestMode) return;
+        if (!m_editorLayer) return;
         if (m_fields->isHolding) return;
         m_fields->isHolding = true;
 
-        float px   = this->getPositionX();
+        float px   = m_player1->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-press");
 
-        g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
-        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        m_editorLayer->createObjectsFromString(buildOptionString(px, 1), true, true);
+        m_editorLayer->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
     }
 
-    void releaseButton(PlayerButton button) {
-        PlayerObject::releaseButton(button);
+    void releaseButton(int button, bool player1) {
+        PlayLayer::releaseButton(button, player1);
 
-        if (button != PlayerButton::Jump) return;
+        if (!player1 || button != 1) return;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return;
-        if (!g_editor) return;
-        if (g_editor->m_player1 != this) return;
+        if (!m_isTestMode) return;
+        if (!m_editorLayer) return;
         if (!m_fields->isHolding) return;
         m_fields->isHolding = false;
 
-        float px   = this->getPositionX();
+        float px   = m_player1->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
         int count  = (int)Mod::get()->getSettingValue<int64_t>("pickup-count-release");
 
-        g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
-        g_editor->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
+        m_editorLayer->createObjectsFromString(buildOptionString(px, -1), true, true);
+        m_editorLayer->createObjectsFromString(buildPickupString(px, itemID, count), true, true);
     }
 };
