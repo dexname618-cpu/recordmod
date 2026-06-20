@@ -14,8 +14,8 @@ class $modify(MyLevelEditorLayer, LevelEditorLayer) {
     }
 
     void onExit() {
-        LevelEditorLayer::onExit();
         g_editor = nullptr;
+        LevelEditorLayer::onExit();
     }
 };
 
@@ -49,15 +49,18 @@ class $modify(MyPlayerObject, PlayerObject) {
 
         if (button != PlayerButton::Jump) return result;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
+
+        // Перевіряємо що g_editor живий і це його player1
         if (!g_editor) return result;
+        if (!g_editor->m_player1) return result;
         if (g_editor->m_player1 != this) return result;
+
         if (m_fields->isHolding) return result;
         m_fields->isHolding = true;
 
         float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
 
-        // Press: Enable P1 Controls (-1), Count = 1
         g_editor->createObjectsFromString(buildOptionString(px, -1), true, true);
         g_editor->createObjectsFromString(buildPickupString(px, itemID, 1), true, true);
 
@@ -69,15 +72,17 @@ class $modify(MyPlayerObject, PlayerObject) {
 
         if (button != PlayerButton::Jump) return result;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
+
         if (!g_editor) return result;
+        if (!g_editor->m_player1) return result;
         if (g_editor->m_player1 != this) return result;
+
         if (!m_fields->isHolding) return result;
         m_fields->isHolding = false;
 
         float px   = this->getPositionX();
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
 
-        // Release: Disable P1 Controls (1), Count = 0
         g_editor->createObjectsFromString(buildOptionString(px, 1), true, true);
         g_editor->createObjectsFromString(buildPickupString(px, itemID, 0), true, true);
 
