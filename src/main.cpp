@@ -3,18 +3,18 @@
 
 using namespace geode::prelude;
 
-static std::string buildOptionString(float x, int mode) {
+static std::string buildOptionString(float x, float y, int mode) {
     return "1,2899,"
            "2," + std::to_string((int)x) + ","
-           "3,15,"
+           "3," + std::to_string((int)y) + ","
            "36,1,"
            "165," + std::to_string(mode) + ";";
 }
 
-static std::string buildPickupString(float x, int itemID, int count) {
+static std::string buildPickupString(float x, float y, int itemID, int count) {
     return "1,1817,"
            "2," + std::to_string((int)x) + ","
-           "3,45,"
+           "3," + std::to_string((int)y) + ","
            "36,1,"
            "80," + std::to_string(itemID) + ","
            "77," + std::to_string(count) + ","
@@ -34,7 +34,6 @@ class $modify(MyPlayerObject, PlayerObject) {
         if (button != PlayerButton::Jump) return result;
         if (!Mod::get()->getSettingValue<bool>("enabled")) return result;
 
-        // Перевіряємо що m_gameLayer це саме LevelEditorLayer
         auto* editor = typeinfo_cast<LevelEditorLayer*>(m_gameLayer);
         if (!editor) return result;
         if (editor->m_player1 != this) return result;
@@ -43,10 +42,11 @@ class $modify(MyPlayerObject, PlayerObject) {
         m_fields->isHolding = true;
 
         float px   = this->getPositionX();
+        float py   = this->getPositionY() + 60.f;
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
 
-        editor->createObjectsFromString(buildOptionString(px, -1), true, true);
-        editor->createObjectsFromString(buildPickupString(px, itemID, 1), true, true);
+        editor->createObjectsFromString(buildOptionString(px, py, -1), true, true);
+        editor->createObjectsFromString(buildPickupString(px, py, itemID, 1), true, true);
 
         return result;
     }
@@ -65,10 +65,11 @@ class $modify(MyPlayerObject, PlayerObject) {
         m_fields->isHolding = false;
 
         float px   = this->getPositionX();
+        float py   = this->getPositionY() + 60.f;
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
 
-        editor->createObjectsFromString(buildOptionString(px, 1), true, true);
-        editor->createObjectsFromString(buildPickupString(px, itemID, 0), true, true);
+        editor->createObjectsFromString(buildOptionString(px, py, 1), true, true);
+        editor->createObjectsFromString(buildPickupString(px, py, itemID, 0), true, true);
 
         return result;
     }
