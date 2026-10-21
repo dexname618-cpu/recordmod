@@ -27,7 +27,7 @@
             "name": "Options On Group ID",
             "type": "int",
             "default": 1,
-            "min": 1,
+            "min": 0,
             "max": 9999
         }
     }
