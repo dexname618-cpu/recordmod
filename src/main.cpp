@@ -3,12 +3,17 @@
 
 using namespace geode::prelude;
 
-static std::string buildOptionString(float x, float y, int mode) {
-    return "1,2899,"
-           "2," + std::to_string((int)x) + ","
-           "3," + std::to_string((int)y) + ","
-           "36,1,"
-           "165," + std::to_string(mode) + ";";
+static std::string buildOptionString(float x, float y, int mode, int groupID = 0) {
+    std::string s = "1,2899,"
+                    "2," + std::to_string((int)x) + ","
+                    "3," + std::to_string((int)y) + ","
+                    "36,1,"
+                    "165," + std::to_string(mode) + ",";
+    if (groupID > 0) {
+        s += "57," + std::to_string(groupID) + ",";
+    }
+    s += ";";
+    return s;
 }
 
 static std::string buildPickupString(float x, float y, int itemID, int count) {
@@ -67,8 +72,9 @@ class $modify(MyPlayerObject, PlayerObject) {
         float px   = this->getPositionX();
         float py   = this->getPositionY() + 60.f;
         int itemID = (int)Mod::get()->getSettingValue<int64_t>("pickup-item-id");
-
-        editor->createObjectsFromString(buildOptionString(px, py, 1), true, true);
+        int onGroup = (int)Mod::get()->getSettingValue<int64_t>("options-on-group-id");
+        
+        editor->createObjectsFromString(buildOptionString(px, py, 1, onGroup), true, true);
         editor->createObjectsFromString(buildPickupString(px, py, itemID, 0), true, true);
 
         return result;
